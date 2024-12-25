@@ -13,8 +13,6 @@ import { cld } from "../lib/cloudinary";
 
 export default function PostListItem({ post }: { post: any }) {
   const myImage = cld.image(post.image);
-  const {width, height} = useWindowDimensions();
-  console.log(width, height);
   myImage
   .resize(thumbnail().width(500).height(500));  // Crop the image, focusing on the face.
   // .roundCorners(byRadius(100)); 

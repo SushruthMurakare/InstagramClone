@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import posts from "~/assets/data/posts.json";
 import * as ImagePicker from "expo-image-picker";
 import Button from "~/src/components/Button";
+import { uploadImage } from "~/src/lib/cloudinary";
 
 export default function FeedScreen() {
   const [caption, setCaption] = useState("");
@@ -25,6 +26,19 @@ export default function FeedScreen() {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+    }
+  };
+
+  const createPost = async () => {
+    //save the post to the database
+    if (!image) {
+      console.error("Image is required");
+      return;}
+    const response = await uploadImage(image);
+    if (response && response.public_id) {
+      console.log("image_id", response.public_id);
+    } else {
+      console.error("Failed to upload image or response is undefined");
     }
   };
   return (
@@ -52,7 +66,7 @@ export default function FeedScreen() {
         {/* <Pressable className="bg-blue-500 w-full p-3 items-center rounded-md">
           <Text className="text-white font-semibold">Share</Text>
         </Pressable> */}
-        <Button text={'Share'} onPress={()=>{}} />
+        <Button text={"Share"} onPress={createPost} />
       </View>
     </View>
   );
