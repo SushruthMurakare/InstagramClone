@@ -4,10 +4,15 @@ import posts from "~/assets/data/posts.json";
 import * as ImagePicker from "expo-image-picker";
 import Button from "~/src/components/Button";
 import { uploadImage } from "~/src/lib/cloudinary";
+import { supabase } from "~/src/lib/supabase";
+import { useAuth } from "~/src/provider/AuthProvider";
+import { router } from "expo-router";
 
-export default function FeedScreen() {
+export default function CreatePost() {
   const [caption, setCaption] = useState("");
   const [image, setImage] = useState<string | null>(null);
+
+  const { session } = useAuth();
 
   useEffect(() => {
     if (!image) {
@@ -33,8 +38,19 @@ export default function FeedScreen() {
     //save the post to the database
     if (!image) {
       console.error("Image is required");
-      return;}
+      return;
+    }
     const response = await uploadImage(image);
+
+    const { data, error } = await supabase
+      .from("posts")
+      .insert([
+        { caption, image: response.public_id, user_id: session?.user?.id },
+      ])
+      .select();
+
+      router.push('/(tabs)');
+
     if (response && response.public_id) {
       console.log("image_id", response.public_id);
     } else {
